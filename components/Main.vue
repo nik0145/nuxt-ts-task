@@ -1,33 +1,46 @@
 <template>
-  <div class="container">
-    <p v-if="isLoading">Загрузка</p>
-    <!-- <pre>data : {{ data }}</pre> -->
-    <!-- <p v-for="item in data" :key="item.id">{{item}}</p> -->
+  <div class="container" v-loading="isLoading">
     <el-collapse accordion>
       <el-collapse-item v-for="item in data" :key="item.id">
         <template slot="title">
-          {{item.nameGroup}}
+          {{ item.nameGroup }}
         </template>
-        <Item v-for="item in item.items" :key="item.id" :item="item" :rate="rate"/>
-       
+        <Item
+          v-for="item in item.items"
+          @add="onAddItemBasket(item)"
+          :key="item.id"
+          :item="item"
+          :rate="rate"
+        />
       </el-collapse-item>
-
-
     </el-collapse>
+    <ShoppingBasket :items="basketItems" @change-count="changeCount" @delete="onDeleteItemBasket" />
+    <pre>{{basketItems}}</pre>
   </div>
 </template>
 
 <script lang="ts">
-import DataService from "../services/DataService";
+import DataService from "@/services/DataService";
 import { defineComponent, onMounted, ref } from "@vue/composition-api";
-import { Names } from "../types/names";
-import { Data, DataConvert,Item } from "../types/data";
+import { Names } from "@/types/names";
+import { Data, DataConvert, Item } from "@/types/data";
 export default defineComponent({
   setup() {
     const nameProduct = "Goods";
     const dollarRate = 74.08;
 
     const data = ref({});
+    let basketItems = ref<any[]>([]);
+    const onAddItemBasket = (item: any) => {
+      basketItems.value.push({...item,count:1});
+    };
+    const changeCount = (index:any,item: any) => {
+      console.log('item',item)
+      basketItems.value[index].count = item
+    };
+    const onDeleteItemBasket = (id: number) => {
+      basketItems.value = basketItems.value.filter((item: { id: number; }) =>  item.id !== id)
+    };
     const isLoading = ref(true);
     onMounted(async () => {
       setTimeout(async () => {
@@ -42,7 +55,7 @@ export default defineComponent({
               const itemGroup = {
                 ...itemData,
                 title: itemsName[ItemId].N,
-                id:ItemId,
+                id: ItemId,
                 amount,
                 price
               };
@@ -72,7 +85,11 @@ export default defineComponent({
 
     return {
       isLoading,
-      rate:dollarRate,
+      changeCount,
+      onAddItemBasket,
+      onDeleteItemBasket,
+      basketItems,
+      rate: dollarRate,
       data
     };
   }
