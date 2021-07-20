@@ -1,9 +1,14 @@
 <template>
   <div class="container" v-loading="isLoading">
-    <el-collapse accordion>
-      <el-collapse-item v-for="item in data" :key="item.id">
+    <el-collapse class="groups" v-model="activeNames">
+      <el-collapse-item
+        class="group"
+        v-for="item in data"
+        :key="item.id"
+        :name="item.id"
+      >
         <template slot="title">
-          {{ item.nameGroup }}
+          <h3>{{ item.nameGroup }}</h3>
         </template>
         <Item
           v-for="item in item.items"
@@ -14,8 +19,12 @@
         />
       </el-collapse-item>
     </el-collapse>
-    <ShoppingBasket :items="basketItems" @change-count="changeCount" @delete="onDeleteItemBasket" />
-    <pre>{{basketItems}}</pre>
+    <ShoppingBasket
+      :items="basketItems"
+      @change-count="changeCount"
+      @delete="onDeleteItemBasket"
+    />
+    <pre>{{ basketItems }}</pre>
   </div>
 </template>
 
@@ -30,16 +39,19 @@ export default defineComponent({
     const dollarRate = 74.08;
 
     const data = ref({});
+    const activeNames = ref<Number[]>([]);
     let basketItems = ref<any[]>([]);
     const onAddItemBasket = (item: any) => {
-      basketItems.value.push({...item,count:1});
+      basketItems.value.push({ ...item, count: 1 });
     };
-    const changeCount = (index:any,item: any) => {
-      console.log('item',item)
-      basketItems.value[index].count = item
+    const changeCount = (index: any, item: any) => {
+      console.log("item", item);
+      basketItems.value[index].count = item;
     };
     const onDeleteItemBasket = (id: number) => {
-      basketItems.value = basketItems.value.filter((item: { id: number; }) =>  item.id !== id)
+      basketItems.value = basketItems.value.filter(
+        (item: { id: number }) => item.id !== id
+      );
     };
     const isLoading = ref(true);
     onMounted(async () => {
@@ -71,6 +83,7 @@ export default defineComponent({
               return acc;
             };
             data.value = Value[nameProduct].reduce(convertDataReducer, {});
+            activeNames.value = Object.keys(data.value).map(Number);
           } else {
             throw Error;
           }
@@ -80,12 +93,13 @@ export default defineComponent({
         } finally {
           isLoading.value = false;
         }
-      }, 900);
+      }, 300);
     });
 
     return {
       isLoading,
       changeCount,
+      activeNames,
       onAddItemBasket,
       onDeleteItemBasket,
       basketItems,
@@ -95,13 +109,30 @@ export default defineComponent({
   }
 });
 </script>
-
 <style>
 .container {
+  width: 80%;
+  margin: 0 auto;
+}
+*{
+  padding: 0;margin: 0;
+}
+.groups {
+  box-sizing:border-box;
+  max-height: 730px;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  height: 100vh;
+  flex-wrap: wrap;
+}
+.el-collapse-item__wrap {
+  border-bottom: none;
+}
+.el-collapse-item__header {
+  background: #d2dde1;
+  border-radius: 4px;
+}
+.group {
+  width: 50%;
+  margin: 4px;
 }
 </style>

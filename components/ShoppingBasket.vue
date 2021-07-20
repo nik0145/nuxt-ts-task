@@ -3,7 +3,7 @@
     <el-table :data="items" border style="width: 100%">
       <el-table-column prop="title" label="Наименование товара и описание">
       </el-table-column>
-      <el-table-column prop="amount" label="Количество" width="180">
+      <el-table-column prop="amount" label="Количество" width="200">
         <template slot-scope="scope">
           <!-- //? вместо scope.$index лучще использовать id, но для удобства просто отправлю index в массиве -->
           <!-- //? вместо v-model value чтобы не мутировать пропс -->
@@ -15,8 +15,11 @@
           ></el-input-number>
         </template>
       </el-table-column>
-      <el-table-column prop="price" label="Цена"> </el-table-column>
-      <el-table-column fixed="right" label="Действия" width="120">
+      <el-table-column prop="price" label="Цена" width="160">
+         <template slot-scope="scope">
+           <span>{{scope.row.price}} руб. / шт</span>
+            </template></el-table-column>
+      <el-table-column fixed="right" label="" width="60">
         <template slot-scope="scope">
           <el-button
             @click.native.prevent="$emit('delete', scope.row.id)"
@@ -27,13 +30,10 @@
         </template>
       </el-table-column>
     </el-table>
-    <el-row :gutter="20">
-      <el-col :span="12" :offset="12"
-        ><div class="grid-content bg-purple">
-          Общая стоимость: {{ totalCost }}
-        </div></el-col
-      >
-    </el-row>
+
+    <div class="total">
+        Общая стоимость: {{ totalCost }}
+    </div>
   </div>
 </template>
 
@@ -63,5 +63,8 @@ export default defineComponent({
 });
 </script>
 <style>
-
+.total{
+  margin-top: 10px;
+  text-align: right;
+}
 </style>
