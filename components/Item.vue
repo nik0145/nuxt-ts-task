@@ -44,10 +44,10 @@ export default defineComponent({
   setup(props) {
     const { rate, item } = toRefs(props);
     const typeColor = ref<String>("");
-    const price = computed(() =>
+    const price = computed((): number =>
       Number((rate.value * item.value.price).toFixed(2))
     );
-    watch(price, (newPrice, oldPrice) => {
+    watch(price, (newPrice, oldPrice): void => {
       typeColor.value = newPrice > oldPrice ? "red" : "green";
     });
     return {

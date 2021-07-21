@@ -12,6 +12,7 @@ export interface DataConvert {
 export interface Item extends Good {
     title: string;
     id: number;
+    count: number;
     amount: number;
     price: number;
 }

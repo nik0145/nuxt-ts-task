@@ -38,12 +38,13 @@
 
 <script lang="ts">
 import { defineComponent, computed, toRefs } from "@vue/composition-api";
+import { Item } from "~/types/data";
 
 export default defineComponent({
   emits: ["delete", "change-count"],
   props: {
     items: {
-      type: Array,
+      type: Array as () => Array<Item>,
       required: true
     },
     rate: {
@@ -54,12 +55,14 @@ export default defineComponent({
 
   setup(props) {
     const { items, rate } = toRefs(props);
-    const totalCost = computed(() =>
-      items.value
-        .reduce((total: number, i: any) => {
-          return total + i.price * i.count * rate.value;
-        }, 0)
-        .toFixed(2)
+    const totalCost = computed((): number =>
+      Number(
+        items.value
+          .reduce((total: number, i: Item) => {
+            return total + i.price * i.count * rate.value;
+          }, 0)
+          .toFixed(2)
+      )
     );
     return {
       totalCost

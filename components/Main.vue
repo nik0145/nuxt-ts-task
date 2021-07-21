@@ -40,22 +40,22 @@ export default defineComponent({
     const nameProduct = "Goods";
     const randomDollarValues: [number, number] = [20, 80];
 
-    const data = ref({});
+    const data = ref<Data[]>([]);
     const activeNames = ref<Number[]>([]);
-    let basketItems = ref<any[]>([]);
+    let basketItems = ref<Item[]>([]);
 
     const isLoading = ref<Boolean>(true);
 
     const getRandom = (min: number, max: number): number =>
       Number((Math.random() * (max - min) + min).toFixed());
 
-    const onAddItemBasket = (item: any) => {
+    const onAddItemBasket = (item: Item):void => {
       basketItems.value.push({ ...item, count: 1 });
     };
-    const changeCount = (index: number, item: any) => {
-      basketItems.value[index].count = item;
+    const changeCount = (index: number, count: number):void => {
+      basketItems.value[index].count = count;
     };
-    const onDeleteItemBasket = (id: number) => {
+    const onDeleteItemBasket = (id: number):void => {
       basketItems.value = basketItems.value.filter(
         (item: { id: number }) => item.id !== id
       );
@@ -64,13 +64,13 @@ export default defineComponent({
     const onGetData = async () => {
 
       dollarRate.value = getRandom(...randomDollarValues);
-      
+
       await setTimeout(async () => {
         try {
           const { Success, Error, Value } = await DataService.getData();
           if (Success) {
             const names: Names[] = await DataService.getNames();
-            const convertDataReducer = (acc: DataConvert[], itemData: Item) => {
+            const convertDataReducer = (acc: DataConvert[], itemData: Item):DataConvert[] => {
               const { C: price, P: amount, G: id, T: ItemId } = itemData;
               const { G: nameGroup, B: itemsName } = names[id];
               //? хз нужно ли все остальное, но не зря же эти поля существуют
