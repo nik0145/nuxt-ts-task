@@ -16,9 +16,10 @@
         </template>
       </el-table-column>
       <el-table-column prop="price" label="Цена" width="160">
-         <template slot-scope="scope">
-           <span>{{scope.row.price}} руб. / шт</span>
-            </template></el-table-column>
+        <template slot-scope="scope">
+          <span>{{ (scope.row.price * rate).toFixed(2) }} руб. / шт</span>
+        </template></el-table-column
+      >
       <el-table-column fixed="right" label="" width="60">
         <template slot-scope="scope">
           <el-button
@@ -31,9 +32,7 @@
       </el-table-column>
     </el-table>
 
-    <div class="total">
-        Общая стоимость: {{ totalCost }}
-    </div>
+    <div class="total">Общая стоимость: {{ totalCost }}</div>
   </div>
 </template>
 
@@ -46,15 +45,21 @@ export default defineComponent({
     items: {
       type: Array,
       required: true
+    },
+    rate: {
+      type: Number,
+      required: true
     }
   },
 
   setup(props) {
-    const { items } = toRefs(props);
+    const { items, rate } = toRefs(props);
     const totalCost = computed(() =>
-      items.value.reduce((total:number, i: any) => {
-        return total + i.price * i.count;
-      }, 0).toFixed(2)
+      items.value
+        .reduce((total: number, i: any) => {
+          return total + i.price * i.count * rate.value;
+        }, 0)
+        .toFixed(2)
     );
     return {
       totalCost
@@ -63,7 +68,7 @@ export default defineComponent({
 });
 </script>
 <style>
-.total{
+.total {
   margin-top: 10px;
   text-align: right;
 }

@@ -4,21 +4,27 @@
 
     <div class="action-price">
       <div class="btn-wrap">
-         <el-button
-        type="primary"
-        icon="el-icon-plus"
-        @click="$emit('add')"
-        circle
-      ></el-button>
+        <el-button
+          type="primary"
+          icon="el-icon-plus"
+          @click="$emit('add')"
+          circle
+        ></el-button>
       </div>
-     
-      <span class="price"> {{ price }}</span>
+
+      <span :class="[typeColor, 'price']"> {{ price }}</span>
     </div>
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent, computed } from "@vue/composition-api";
+import {
+  defineComponent,
+  computed,
+  toRefs,
+  ref,
+  watch
+} from "@vue/composition-api";
 import { Item } from "../types/data";
 
 export default defineComponent({
@@ -35,12 +41,18 @@ export default defineComponent({
     }
   },
 
-  setup({ rate, item }) {
-    //*вынести вверх
-    const price = computed(() => (rate * item.price).toFixed(2));
-
+  setup(props) {
+    const { rate, item } = toRefs(props);
+    const typeColor = ref<String>("");
+    const price = computed(() =>
+      Number((rate.value * item.value.price).toFixed(2))
+    );
+    watch(price, (newPrice, oldPrice) => {
+      typeColor.value = newPrice > oldPrice ? "red" : "green";
+    });
     return {
-      price
+      price,
+      typeColor
     };
   }
 });
@@ -53,10 +65,16 @@ export default defineComponent({
   line-height: 50px;
   text-align: center;
 }
-.action-price{
+.red {
+  background: red;
+}
+.green {
+  background: green;
+}
+.action-price {
   display: flex;
 }
-.btn-wrap{
+.btn-wrap {
   margin-top: 5px;
   margin-right: 5px;
 }

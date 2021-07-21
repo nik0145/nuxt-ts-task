@@ -21,10 +21,10 @@
     </el-collapse>
     <ShoppingBasket
       :items="basketItems"
+      :rate="rate"
       @change-count="changeCount"
       @delete="onDeleteItemBasket"
     />
-    <pre>{{ basketItems }}</pre>
   </div>
 </template>
 
@@ -35,17 +35,24 @@ import { Names } from "@/types/names";
 import { Data, DataConvert, Item } from "@/types/data";
 export default defineComponent({
   setup() {
+    let dollarRate = ref<Number>(0);
+
     const nameProduct = "Goods";
-    const dollarRate = 74.08;
+    const randomDollarValues: [number, number] = [20, 80];
 
     const data = ref({});
     const activeNames = ref<Number[]>([]);
     let basketItems = ref<any[]>([]);
+
+    const isLoading = ref<Boolean>(true);
+
+    const getRandom = (min: number, max: number): number =>
+      Number((Math.random() * (max - min) + min).toFixed());
+
     const onAddItemBasket = (item: any) => {
       basketItems.value.push({ ...item, count: 1 });
     };
-    const changeCount = (index: any, item: any) => {
-      console.log("item", item);
+    const changeCount = (index: number, item: any) => {
       basketItems.value[index].count = item;
     };
     const onDeleteItemBasket = (id: number) => {
@@ -53,9 +60,12 @@ export default defineComponent({
         (item: { id: number }) => item.id !== id
       );
     };
-    const isLoading = ref(true);
-    onMounted(async () => {
-      setTimeout(async () => {
+
+    const onGetData = async () => {
+
+      dollarRate.value = getRandom(...randomDollarValues);
+      
+      await setTimeout(async () => {
         try {
           const { Success, Error, Value } = await DataService.getData();
           if (Success) {
@@ -94,6 +104,13 @@ export default defineComponent({
           isLoading.value = false;
         }
       }, 300);
+    };
+
+    onMounted(async () => {
+      await onGetData();
+      setInterval(async () => {
+        await onGetData();
+      }, 15000);
     });
 
     return {
@@ -114,11 +131,12 @@ export default defineComponent({
   width: 80%;
   margin: 0 auto;
 }
-*{
-  padding: 0;margin: 0;
+* {
+  padding: 0;
+  margin: 0;
 }
 .groups {
-  box-sizing:border-box;
+  box-sizing: border-box;
   max-height: 730px;
   display: flex;
   flex-direction: column;
