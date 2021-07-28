@@ -6,7 +6,7 @@
       <div class="btn-wrap">
         <el-button
           type="primary"
-          :disabled="asd"
+          :disabled="isDisabled"
           icon="el-icon-plus"
           @click="$emit('add')"
           circle
@@ -52,14 +52,14 @@ export default defineComponent({
     const price = computed((): number =>
       Number((rate.value * item.value.price).toFixed(2))
     );
-    const asd = computed((): boolean =>
+    const isDisabled = computed((): boolean =>
       !!basket.value.filter(i=>i.id===item.value.id).length
     );
     watch(price, (newPrice, oldPrice): void => {
       typeColor.value = newPrice > oldPrice ? "red" : "green";
     });
     return {
-      asd,
+      isDisabled,
       price,
       typeColor
     };
