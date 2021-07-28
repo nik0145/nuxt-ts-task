@@ -6,6 +6,7 @@
       <div class="btn-wrap">
         <el-button
           type="primary"
+          :disabled="asd"
           icon="el-icon-plus"
           @click="$emit('add')"
           circle
@@ -34,6 +35,10 @@ export default defineComponent({
       type: Object as () => Item,
       required: true
     },
+    basket: {
+      type: Array as () => Array<Item>,
+      default:[]
+    },
     rate: {
       type: Number,
       required: false,
@@ -42,15 +47,19 @@ export default defineComponent({
   },
 
   setup(props) {
-    const { rate, item } = toRefs(props);
+    const { rate, item,basket } = toRefs(props);
     const typeColor = ref<String>("");
     const price = computed((): number =>
       Number((rate.value * item.value.price).toFixed(2))
+    );
+    const asd = computed((): boolean =>
+      !!basket.value.filter(i=>i.id===item.value.id).length
     );
     watch(price, (newPrice, oldPrice): void => {
       typeColor.value = newPrice > oldPrice ? "red" : "green";
     });
     return {
+      asd,
       price,
       typeColor
     };

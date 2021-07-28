@@ -14,6 +14,7 @@
           v-for="item in item.items"
           @add="onAddItemBasket(item)"
           :key="item.id"
+          :basket="basketItems"
           :item="item"
           :rate="rate"
         />
